@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from models.users import User
+from models.users import User, UserUpdate
 from config.dbconfig import collection_name
 from schema.users import list_serial
 from bson import ObjectId
@@ -26,18 +26,20 @@ async def post_user(user: User):
         "message": "User created successfully"
     }
 
-@endpoints.put("/v1/users/{id}")
-async def update_user(user: User, id: str):
-    collection_name.find_one_and_update({"_id": ObjectId(id)}, {"$set": dict(user)})
-    return {
-        "status": "OK",
-        "message": "User updated successfully"
-    }
-
 @endpoints.delete("/v1/users/{id}")
 async def delete_user(id: str):
     collection_name.find_one_and_delete({"_id": ObjectId(id)})
     return {
         "status": "OK",
         "message": "User deleted successfully"
+    }
+
+@endpoints.patch("/v1/users/{id}")
+async def patch_user(user: UserUpdate, id: str):
+    update_data = user.dict(exclude_unset=True)
+    if update_data:
+        collection_name.find_one_and_update({"_id": ObjectId(id)}, {"$set": update_data})
+    return {
+        "status": "OK",
+        "message": "User updated successfully"
     }
