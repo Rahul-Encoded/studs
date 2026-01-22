@@ -25,4 +25,19 @@ async def post_user(user: User):
         "status": "OK",
         "message": "User created successfully"
     }
-    
+
+@endpoints.put("/v1/users/{id}")
+async def update_user(user: User, id: str):
+    collection_name.find_one_and_update({"_id": ObjectId(id)}, {"$set": dict(user)})
+    return {
+        "status": "OK",
+        "message": "User updated successfully"
+    }
+
+@endpoints.delete("/v1/users/{id}")
+async def delete_user(id: str):
+    collection_name.find_one_and_delete({"_id": ObjectId(id)})
+    return {
+        "status": "OK",
+        "message": "User deleted successfully"
+    }
